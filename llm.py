@@ -57,11 +57,11 @@ def generate_summary(resume_text):
         - Strictly follow the format below
         
         Format:
-        **Summary:** 3-4 sentence professional summary
+        **Summary:** Generate a 3-4 sentence professional summary
         
         **Top 5 Skills:** skill1, skill2, skill3, skill4, skill5
         
-        **Years of Experience:** X years
+        **Years of Experience:** X years Y months
         
         **Most Recent Role:** Job Title at Company (dates)
         
