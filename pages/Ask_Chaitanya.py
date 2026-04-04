@@ -1,7 +1,7 @@
 import streamlit as st
 from rag import load_resume
 from excel_logger import log_rag
-from llm import generate_summary, ask_question
+from llm import generate_summary, ask_question, correct_question
 from vectorstore import (
     create_vectorstore,
     collection_exists,
@@ -54,10 +54,21 @@ if chai_question:
     with st.chat_message("user"):
         st.write(chai_question)
 
+    modified_question = correct_question(chai_question)
     # Retrieve relevant chunks from vector store based on the question
-    relevant_chunks = search_vectorstore(chai_question)
-    context = "\n".join(relevant_chunks)
-    st.write(relevant_chunks)
+    relevant_chunks = search_vectorstore(modified_question)
+
+    # st.write(relevant_chunks)
+
+    # if LLM fails to find relevant chunks, use full resume as context (fallback)
+    if not relevant_chunks:
+        context = st.session_state.chai_resume_text
+        st.info(
+            "Failed to find relevant information. Using full resume to generate answer."
+        )
+    else:
+        context = "\n".join(relevant_chunks)
+
     # Generate answer using LLM with retrieved context
     with st.chat_message("assistant"):
         answer = st.write_stream(

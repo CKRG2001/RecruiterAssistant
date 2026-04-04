@@ -5,7 +5,7 @@ embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 
 # Chunking text into smaller pieces with
-def chunk_text(text, chunk_size=500, chunk_overlap=50):
+def chunk_text(text, chunk_size=800, chunk_overlap=150):
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size, chunk_overlap=chunk_overlap
     )

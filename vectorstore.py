@@ -43,15 +43,25 @@ def get_vectorstore(collection_name="resume"):
         return None
 
 
-def search_vectorstore(query, collection_name="resume", top_k=5):
+def search_vectorstore(query, collection_name="resume", top_k=3):
     collection = get_vectorstore(collection_name)
     if collection is None:
         return []
 
-    query_embedding = get_embeddings([query])[0]
+    expanded_query = f"""{query} skills experience technologies tools"""
+    query_embedding = get_embeddings([expanded_query])[0]
 
     results = collection.query(
-        query_embeddings=[query_embedding.tolist()], n_results=top_k
+        query_embeddings=[query_embedding.tolist()],
+        n_results=top_k,
+        include=["documents", "distances"],
     )
+    documents = results["documents"][0]
+    distances = results["distances"][0]
 
-    return results["documents"][0]
+    filtered_docs = [doc for doc, dist in zip(documents, distances) if dist < 0.5]
+
+    if not filtered_docs:
+        filtered_docs = documents
+
+    return filtered_docs
