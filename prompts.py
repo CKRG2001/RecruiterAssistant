@@ -71,7 +71,7 @@ summary_generation_prompt = """
             **Most Recent Role:** Job Title at Company (dates)
 
             **Key Achievements:**
-            - Achievement 1 (with impact/metrics)
+            - Achievement 1    
             - Achievement 2
             - Achievement 3
 

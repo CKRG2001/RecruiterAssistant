@@ -14,7 +14,7 @@ st.set_page_config(page_title="Recruiter Assistant", page_icon="", layout="wide"
 
 
 if st.button("← Back to Home"):
-    st.switch_page("app.py")
+    st.switch_page("main.py")
 
 if "chai_resume_text" not in st.session_state:
     st.session_state.chai_resume_text = load_resume()
@@ -30,7 +30,6 @@ if "rag_ready" not in st.session_state:
 
 
 st.title("🧑‍💼 About me")
-st.subheader("Summary")
 if "chai_summary" not in st.session_state:
     with st.spinner("Generating Summary...would take a minute..."):
         st.session_state.chai_summary = generate_summary(
@@ -41,7 +40,6 @@ st.markdown("---")
 
 if "chai_messages" not in st.session_state:
     st.session_state.chai_messages = []
-
 for msg in st.session_state.chai_messages:
     with st.chat_message(msg["role"]):
         st.write(msg["content"])
@@ -53,8 +51,12 @@ chai_question = st.chat_input(
 if chai_question:
     with st.chat_message("user"):
         st.write(chai_question)
-
-    modified_question = correct_question(chai_question)
+    if len(st.session_state.chai_messages) >= 2:
+        last_query = st.session_state.chai_messages[-2]["content"]
+        enhanced_query = last_query + " " + chai_question
+    else:
+        enhanced_query = chai_question
+    modified_question = correct_question(enhanced_query)
     # Retrieve relevant chunks from vector store based on the question
     relevant_chunks = search_vectorstore(modified_question)
 

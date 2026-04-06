@@ -5,7 +5,7 @@ from llm import ask_question, generate_summary
 st.set_page_config(page_title="Recruiter Assistant", page_icon="", layout="wide")
 
 if st.button("← Back to Home"):
-    st.switch_page("app.py")
+    st.switch_page("main.py")
 
 
 st.title("🧑‍💼 Analyze any Candidate Resume")
@@ -60,7 +60,13 @@ if uploaded_file:
         # display user question in chat
         with st.chat_message("user"):
             st.write(question)
+        # if len(st.session_state.messages) >= 2:
+        #     last_query = st.session_state.messages[-2]["content"]
+        #     enhanced_query = last_query + " " + question
+        # else:
+        #     enhanced_query = question
 
+        # modified_question = correct_question(question)
         # get answer
         with st.chat_message("assistant"):
             answer = st.write_stream(

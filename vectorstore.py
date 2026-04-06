@@ -43,13 +43,12 @@ def get_vectorstore(collection_name="resume"):
         return None
 
 
-def search_vectorstore(query, collection_name="resume", top_k=3):
+def search_vectorstore(query, collection_name="resume", top_k=5):
     collection = get_vectorstore(collection_name)
     if collection is None:
         return []
 
-    expanded_query = f"""{query} skills experience technologies tools"""
-    query_embedding = get_embeddings([expanded_query])[0]
+    query_embedding = get_embeddings([query])[0]
 
     results = collection.query(
         query_embeddings=[query_embedding.tolist()],
