@@ -2,13 +2,11 @@ import pandas as pd
 import os
 
 
-def log_rag(question, chunks, answer, file_path="rag_logs.xlsx"):
+def log_rag(question, context, answer, file_path="rag_logs.xlsx"):
     # prepare row
     data = {
         "Question": question,
-        "Chunk_1": chunks[0] if len(chunks) > 0 else "",
-        "Chunk_2": chunks[1] if len(chunks) > 1 else "",
-        "Chunk_3": chunks[2] if len(chunks) > 2 else "",
+        "Context": context,
         "Answer": answer,
     }
 
