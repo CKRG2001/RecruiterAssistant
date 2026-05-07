@@ -1,6 +1,6 @@
 import hashlib
 import streamlit as st
-
+import time
 from file_reader import load_resume, extract_text
 from excel_logger import log_rag
 from llm import generate_summary, json_extraction, ask_question, expand_query
@@ -103,17 +103,16 @@ if not st.session_state.active_rag_ready:
 
 st.subheader(f"Candidate: {candidate_label}")
 
+if not st.session_state.active_json_resume:
+    with st.spinner("Extracting structured resume data..."):
+        st.session_state.active_json_resume = json_extraction(resume_text)
+
 if not st.session_state.active_summary:
     with st.spinner("Generating summary..."):
         st.session_state.active_summary = st.write_stream(generate_summary(resume_text))
 
 with st.expander("Candidate Summary", expanded=False):
     st.write(st.session_state.active_summary)
-
-
-if not st.session_state.active_json_resume:
-    with st.spinner("Extracting structured resume data..."):
-        st.session_state.active_json_resume = json_extraction(resume_text)
 
 
 if "active_messages" not in st.session_state:
@@ -128,6 +127,7 @@ for message in st.session_state.active_messages:
 question = st.chat_input("Ask a question about this candidate...")
 
 if question:
+    start = time.perf_counter()
     with st.chat_message("user"):
         st.write(question)
 
@@ -156,11 +156,12 @@ if question:
                 chat_history=st.session_state.active_messages,
             )
         )
-
+    end = time.perf_counter()
     log_rag(
         question=question,
         context=context,
         answer=answer,
+        time_taken=round(end - start, 2),
     )
 
     st.session_state.active_messages.append({"role": "user", "content": question})

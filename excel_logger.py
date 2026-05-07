@@ -2,12 +2,13 @@ import pandas as pd
 import os
 
 
-def log_rag(question, context, answer, file_path="rag_logs.xlsx"):
+def log_rag(question, context, answer, time_taken, file_path="rag_logs.xlsx"):
     # prepare row
     data = {
         "Question": question,
         "Context": context,
         "Answer": answer,
+        "response_time": time_taken,
     }
 
     df_new = pd.DataFrame([data])
