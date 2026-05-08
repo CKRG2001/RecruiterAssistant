@@ -5,6 +5,7 @@ from file_reader import load_resume, extract_text
 from excel_logger import log_rag
 from llm import generate_summary, json_extraction, ask_question, expand_query
 from vector_store import VectorStore
+from guardrails import validate_question
 
 
 st.set_page_config(
@@ -52,6 +53,9 @@ with st.sidebar:
 
 if source == "Chaitanya's Resume":
     resume_text = load_resume()
+    if not resume_text:
+        st.error("Default resume file not found or empty.")
+        st.stop()
     candidate_label = "Chaitanya"
     collection_name = "chaitanya_resume"
 
@@ -131,12 +135,18 @@ if question:
     with st.chat_message("user"):
         st.write(question)
 
+    guardrail_result = validate_question(question)
+    if not guardrail_result.allowed:
+        with st.chat_message("assistant"):
+            st.warning(guardrail_result.message)
+        st.stop()
+
     expanded_query = [question] + expand_query(
         question,
         st.session_state.active_summary,
     )
 
-    relevant_chunks = vs.search(expanded_query)
+    relevant_chunks = vs.search(list(dict.fromkeys(expanded_query)))
 
     with st.expander("🔍 Retrieved Context", expanded=False):
         st.write(relevant_chunks)
@@ -157,12 +167,15 @@ if question:
             )
         )
     end = time.perf_counter()
-    log_rag(
-        question=question,
-        context=context,
-        answer=answer,
-        time_taken=round(end - start, 2),
-    )
+    try:
+        log_rag(
+            question=question,
+            context=context,
+            answer=answer,
+            time_taken=round(end - start, 2),
+        )
+    except Exception as e:
+        st.toast(f"Failed to log RAG interaction: {e}", icon="⚠️")
 
     st.session_state.active_messages.append({"role": "user", "content": question})
     st.session_state.active_messages.append({"role": "assistant", "content": answer})
