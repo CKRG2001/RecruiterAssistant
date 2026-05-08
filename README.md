@@ -148,20 +148,33 @@ flowchart TD
     N --> O[Guardrail Validation]
 
     O -->|Blocked| P[Safety / Scope Response]
+
     O -->|Allowed| Q[LLM Query Expansion]
+    N --> Q
+    L --> Q
 
-    Q --> R[Semantic Vector Search]
-    R --> S[Keyword Search]
-    S --> T[CrossEncoder Reranking]
-    T --> U[Retrieved Resume Context]
+    Q -->|Original Question + Expanded Queries| R[Hybrid Retrieval]
 
-    U --> V[LLM Answer Generation]
-    M --> V
-    G --> V
+    R --> S[Semantic Vector Search]
+    R --> T[Keyword Search]
 
-    V --> W[Streamed Assistant Answer]
-    W --> X[Excel RAG Logger]
-    W --> B
+    K --> S
+    K --> T
+
+    S --> U[Combine Retrieved Chunks]
+    T --> U
+
+    U --> V[CrossEncoder Reranking]
+    V --> W[Top Resume Context]
+
+    W --> X[LLM Answer Generation]
+    M --> X
+    G --> X
+    N --> X
+
+    X --> Y[Streamed Assistant Answer]
+    Y --> Z[Excel RAG Logger]
+    Y --> B
 ```
 
 ---
